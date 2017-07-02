@@ -1,8 +1,7 @@
 var pjs = new PointJS('2D', 1280 / 2, 720 / 2, { // 16:9
-	backgroundColor : '#FFFFFF' // if need
+	backgroundColor : '#53769A' // if need
 });
 pjs.system.initFullPage(); // for Full Page mode
-// pjs.system.initFullScreen(); // for Full Screen mode (only Desctop)
 
 var log    = pjs.system.log;     // log = console.log;
 var game   = pjs.game;           // Game Manager
@@ -23,53 +22,64 @@ var height = game.getWH().h; // height of scene viewport
 
 pjs.system.setTitle('RPG.io'); // Set Title for Tab or Window
 
+var player = game.newRectObject({
+    position : point(500, -100), // central position of text
+    fillColor : '#EAEAEA', // color text
+    w : 50, h : 50
+});
+/*game.update = function () {
+    // Update function
+    game.clear(); // clear screen
+};
+
+game.entry = function () {
+    // Entry Function
+};
+
+game.exit = function () {
+    // Exit function
+};*/
+
 // Game Loop
-game.newLoopFromConstructor('myGame', function () {
-	// Constructor Game Loop
+game.newLoopFromConstructor('start', function () {
+    var a1 = game.newRectObject({
+        position : point(500, -100), // central position of text
+        fillColor : '#EAEAEA', // color text
+        w : 50, h : 50
+    });
+    var speed = point();
+    var maxSpeed = 2;
 
-	this.update = function () {
-		// Update function
+    var walls = [];
+    OOP.fillArr(walls, 100, function () {
+        return game.newRectObject({
+            position : point(math.random(0, 2000), math.random(0, 2000)),
+            fillColor : '#E77373',
+            w : math.random(20, 100), h : math.random(30, 100)
+        });
+    });
 
-		game.clear(); // clear screen
+    this.update = function () {
 
+        if (key.isDown('A')) {
+            a1.moveAngle(1, pjs.vector.getAngle2Points(a1.getPositionC(), mouse.getPosition()) - 90);
+        } else if (key.isDown('D')) {
+            a1.moveAngle(1, pjs.vector.getAngle2Points(a1.getPositionC(), mouse.getPosition()) + 90);
+        }
 
-	};
+        if (key.isDown('W'))
+            a1.moveToC(mouse.getPosition(), 2);
+        else if (key.isDown('S'))
+            a1.moveToC(mouse.getPosition(), -1);
 
-	// this.entry = function () { // [optional]
-	// 	// Entry Function
-	// 	log('myGame is started');
-	// };
+        a1.rotateForPoint(mouse.getPosition(), 2);
 
-	// this.exit = function () { // [optional]
-	// 	// Exit function
-	// 	log('myGame is stopped');
-	// };
+        game.clear(); // clear screen
+        a1.draw();
+        OOP.drawArr(walls);
+        camera.follow(a1, 20);
+    };
 
 });
 
-// // Advanced Game Loop
-// var MyGame = function () {
-// 	// Constructor Game Loop
-
-// 	this.update = function () {
-// 		// Update function
-// 	};
-
-// 	this.entry = function () {
-// 		// Entry Function
-// 	};
-
-// 	this.exit = function () {
-// 		// Exit function
-// 	};
-
-// };
-// game.newLoopFromClassObject('myGame', new MyGame());
-
-
-// Simple Game Loop
-// game.newLoop('myGame', function () {
-// 	// Update function
-// });
-
-game.startLoop('myGame');
+game.startLoop('start');
