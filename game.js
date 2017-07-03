@@ -22,10 +22,9 @@ var height = game.getWH().h; // height of scene viewport
 
 pjs.system.setTitle('RPG.io'); // Set Title for Tab or Window
 
-var player = createCharacter({
-    position : point(500, -100) // central position of text
-});
-
+var gameLocation = createLocation();
+gameLocation.fillRandomLocation();
+var player = createCharacter(gameLocation.getStartPlayerPosition());
 // Game Loop
 game.newLoopFromConstructor('start', function () {
 
@@ -40,12 +39,13 @@ game.newLoopFromConstructor('start', function () {
 
     this.update = function () {
         game.clear(); // clear screen
+        gameLocation.redrawLocation();
         player.draw();
         player.drawDynamicBox();
-        OOP.drawArr(walls);
+        //OOP.drawArr(walls);
         camera.follow(player, 20);
 
-        player.checkMoving(walls);
+        player.checkMoving(gameLocation.walls);
 
     };
 
