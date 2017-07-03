@@ -1,5 +1,5 @@
 var pjs = new PointJS('2D', 1280 / 2, 720 / 2, { // 16:9
-	backgroundColor : '#53769A' // if need
+	backgroundColor : '#ffffff' // if need
 });
 pjs.system.initFullPage(); // for Full Page mode
 
@@ -22,33 +22,12 @@ var height = game.getWH().h; // height of scene viewport
 
 pjs.system.setTitle('RPG.io'); // Set Title for Tab or Window
 
-var player = game.newRectObject({
-    position : point(500, -100), // central position of text
-    fillColor : '#EAEAEA', // color text
-    w : 50, h : 50
+var player = createCharacter({
+    position : point(500, -100) // central position of text
 });
-/*game.update = function () {
-    // Update function
-    game.clear(); // clear screen
-};
-
-game.entry = function () {
-    // Entry Function
-};
-
-game.exit = function () {
-    // Exit function
-};*/
 
 // Game Loop
 game.newLoopFromConstructor('start', function () {
-    var a1 = game.newRectObject({
-        position : point(500, -100), // central position of text
-        fillColor : '#EAEAEA', // color text
-        w : 50, h : 50
-    });
-    var speed = point();
-    var maxSpeed = 2;
 
     var walls = [];
     OOP.fillArr(walls, 100, function () {
@@ -60,24 +39,14 @@ game.newLoopFromConstructor('start', function () {
     });
 
     this.update = function () {
-
-        if (key.isDown('A')) {
-            a1.moveAngle(1, pjs.vector.getAngle2Points(a1.getPositionC(), mouse.getPosition()) - 90);
-        } else if (key.isDown('D')) {
-            a1.moveAngle(1, pjs.vector.getAngle2Points(a1.getPositionC(), mouse.getPosition()) + 90);
-        }
-
-        if (key.isDown('W'))
-            a1.moveToC(mouse.getPosition(), 2);
-        else if (key.isDown('S'))
-            a1.moveToC(mouse.getPosition(), -1);
-
-        a1.rotateForPoint(mouse.getPosition(), 2);
-
         game.clear(); // clear screen
-        a1.draw();
+        player.draw();
+        player.drawDynamicBox();
         OOP.drawArr(walls);
-        camera.follow(a1, 20);
+        camera.follow(player, 20);
+
+        player.checkMoving(walls);
+
     };
 
 });
