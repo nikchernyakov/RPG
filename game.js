@@ -24,7 +24,7 @@ pjs.system.setTitle('RPG.io'); // Set Title for Tab or Window
 
 var gameLocation = createLocation();
 gameLocation.fillRandomLocation();
-var player = createCharacter(gameLocation.getStartPlayerPosition());
+var player = createCharacter(gameLocation.getPlayerStartPosition());
 // Game Loop
 game.newLoopFromConstructor('start', function () {
 
