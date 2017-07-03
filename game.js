@@ -22,7 +22,7 @@ var height = game.getWH().h; // height of scene viewport
 
 pjs.system.setTitle('RPG.io'); // Set Title for Tab or Window
 
-var gameLocation = createLocation();
+var gameLocation = createGameLocation();
 gameLocation.fillRandomLocation();
 var player = createCharacter(gameLocation.getPlayerStartPosition());
 // Game Loop

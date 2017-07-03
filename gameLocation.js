@@ -1,11 +1,11 @@
-function createLocation() {
-    var location = game.newRectObject({
+function createGameLocation() {
+    var gameLocation = game.newRectObject({
         position: point(0,0),
         fillColor: '#c5c5c5',
         w: 2000, h: 2000
     });
 
-    location.setUserData({
+    gameLocation.setUserData({
 
         borderSize: 50,
 
@@ -46,19 +46,21 @@ function createLocation() {
                 w: this.borderSize, h: this.h
             }));
 
-            var buildingsCount = math.random(3,5);
-            for(var i = 0; i < buildingsCount; i++){
+            var i;
+
+            var spawnsCount = math.random(4, 6);
+            for(i = 0; i < spawnsCount; i++) {
+                this.spawns.push(createRandomSpawn(this));
+            }
+
+            var buildingsCount = math.random(2, 5);
+            for(i = 0; i < buildingsCount; i++){
                 this.buildings.push(createRandomBuilding(this));
             }
 
-            /*var spawnsCount = math.random(12, 16);
-            OOP.forInt(spawnsCount, function () {
-                this.spawns.push(createRandomSpawn());
-            });*/
-
         },
         redrawLocation: function () {
-            location.draw();
+            gameLocation.draw();
             this.drawAllObjects();
         },
 
@@ -71,44 +73,74 @@ function createLocation() {
         }
 
     });
-    return location;
+    return gameLocation;
 }
 
-function checkPositionForIntersect(location, pos) {
+/** Common functions */
+
+function checkPositionForIntersect(gameLocation, pos, objW, objH) {
     var newObj = game.newBaseObject({
-            position: pos
+            positionC: pos,
+            w: objW, h: objH
         }),
         flag = false;
 
-    OOP.forEach(location.getPlacesArray(), function (place) {
+    gameLocation.getPlacesArray().forEach(function (place) {
         flag = newObj.isArrIntersect(place);
+        log(flag);
     });
     return flag;
 }
 
+function generateRandomPos(gameLocation, objW, objH) {
+    return point(math.random(gameLocation.borderSize + objW / 2,
+            gameLocation.w - gameLocation.borderSize - objW / 2),
+        math.random(gameLocation.borderSize + objH / 2,
+            gameLocation.h - gameLocation.borderSize - objH / 2));
+}
+
+function findFreePos(gameLocation, objW, objH) {
+    var pos = generateRandomPos(gameLocation, objW, objH);
+
+    while(checkPositionForIntersect(gameLocation, pos, objW, objH)) {
+        pos = generateRandomPos(gameLocation, objW, objH);
+        log("Try again");
+    }
+
+    return pos;
+}
+
 /** Building functions */
-function createBuilding(pos, w, h) {
+function createBuilding(posC, w, h) {
     return game.newRectObject({
-        positionC: pos,
+        positionC: posC,
+        w: w, h: h,
         fillColor: "#07ff00",
-        alpha: 0.3,
-        w: w, h: h
+        alpha: 0.3
     });
 }
 
-function createRandomBuilding(location){
-    var buildingW = math.random(400,600),
-        buildingH = math.random(400,600),
-        buildingPosC = generateRandomPos(location, buildingW, buildingH);
+function createRandomBuilding(gameLocation){
+    var buildingW = math.random(300, 500),
+        buildingH = math.random(300, 500),
+        buildingPosC = findFreePos(gameLocation, buildingW, buildingH);
 
-    while(checkPositionForIntersect(location, buildingPosC))
-        buildingPosC = generateRandomPos(location, buildingW, buildingH);
     return createBuilding(buildingPosC, buildingW, buildingH);
 }
 
-function generateRandomPos(location, objW, objH) {
-    return point(math.random(location.borderSize + objW / 2,
-            location.w - location.borderSize - objW / 2),
-        math.random(location.borderSize + objH / 2,
-            location.h - location.borderSize - objH / 2));
+/** Spawn functions */
+function createRandomSpawn(gameLocation) {
+    var spawnRadius = math.random(100, 250),
+        spawnPosC = findFreePos(gameLocation, spawnRadius * 2, spawnRadius * 2);
+
+    return createSpawn(spawnPosC, spawnRadius);
+}
+
+function createSpawn(posC, r) {
+    return game.newCircleObject({
+        positionC: posC,
+        radius: r,
+        fillColor: "#ff0600",
+        alpha: 0.3
+    })
 }
