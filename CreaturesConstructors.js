@@ -1,6 +1,14 @@
-function createCreature(obj) {
-    var creature = game.newBaseObject(obj);
-    creature.setUserData({
+function createCreature(pos) {
+    var creature = game.newBaseObject({
+        position: pos
+    });
+    creature.setUserData(getCreature());
+
+    return creature;
+}
+
+function getCreature() {
+    return {
         health : 100,
         setHealth : function (hp) {
             this.health = hp;
@@ -11,20 +19,20 @@ function createCreature(obj) {
         decreaseHealth : function (hp) {
             this.health -= hp;
         }
-    });
-
-    return creature;
+    };
 }
 
 /** https://github.com/nikchernyakov/RPG/wiki/Character */
-function createCharacter(obj) {
-    var character = game.newImageObject(obj);
-    character.setImage("imgs/icons/CharacterIcon.png");
+function createCharacter(pos) {
+    var character = game.newImageObject({
+        position: pos,
+        file: "imgs/icons/CharacterIcon.png"
+    });
     character.setBox({
         size: pjs.vector.size(-35, -35),
         offset : point(17, 17)
     });
-    character.setUserData(createCreature(obj));
+    character.setUserData(getCreature());
     character.setUserData({
         level: 1,
         exp: 0,
