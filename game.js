@@ -45,7 +45,7 @@ game.newLoopFromConstructor('start', function () {
         //OOP.drawArr(walls);
         camera.follow(player, 20);
 
-        player.checkMoving(gameLocation.walls);
+        player.checkMoving(gameLocation.obstacles);
 
     };
 
