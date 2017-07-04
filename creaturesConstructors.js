@@ -41,29 +41,41 @@ function createCharacter(pos) {
         speed: 1,
         abilities: [],
         weapon: undefined,
-        checkMoving: function (objects) {
+        checkMoving: function (arrays) {
+            var speed = 1,
+                angle,
+                flag = false;
+
             if (key.isDown('A')) {
-                this.moveAngle(1, pjs.vector.getAngle2Points(this.getPositionC(), mouse.getPosition()) - 90);
-                if(this.isArrIntersect(objects)){
-                    this.moveAngle(1, pjs.vector.getAngle2Points(this.getPositionC(), mouse.getPosition()) + 90);
-                }
+                angle = -90;
+                flag = true;
             } else if (key.isDown('D')) {
-                this.moveAngle(1, pjs.vector.getAngle2Points(this.getPositionC(), mouse.getPosition()) + 90);
-                if(this.isArrIntersect(objects)){
-                    this.moveAngle(1, pjs.vector.getAngle2Points(this.getPositionC(), mouse.getPosition()) - 90);
+                angle = 90;
+                flag = true;
+            }
+            if(flag){
+                var angle2Points = pjs.vector.getAngle2Points(this.getPositionC(), mouse.getPosition());
+                this.moveAngle(speed, angle2Points + angle);
+                if(isArrayOfArraysIntersect(this, arrays)){
+                    this.moveAngle(speed, angle2Points - angle);
                 }
             }
 
+            flag = false;
             if (key.isDown('W')){
-                this.moveToC(mouse.getPosition(), 2);
-                if(this.isArrIntersect(objects)) {
-                    this.moveToC(mouse.getPosition(), -2);
-                }
+                speed = 2;
+                flag = true;
+
             }
             else if (key.isDown('S')) {
-                this.moveToC(mouse.getPosition(), -1);
-                if (this.isArrIntersect(objects)) {
-                    this.moveToC(mouse.getPosition(), 1);
+                speed = -1;
+                flag = true;
+            }
+            if(flag){
+                var pos = mouse.getPosition();
+                this.moveToC(pos, speed);
+                if(isArrayOfArraysIntersect(this, arrays)) {
+                    this.moveToC(pos, -speed);
                 }
             }
 
