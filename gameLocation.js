@@ -14,37 +14,21 @@ function createGameLocation() {
         blocks: [],
         buildings: [],
         walls: [],
+        obstacles: [],
 
         drawAllObjects: function () {
             OOP.drawArr(this.walls);
             OOP.drawArr(this.blocks);
             OOP.drawArr(this.spawns);
             OOP.drawArr(this.loots);
-            OOP.drawArr(this.buildings);
+            OOP.drawArr(this.buildings, function (building) {
+                OOP.drawArr(building.walls);
+            });
         },
 
         fillRandomLocation: function () {
             // Create walls
-            this.walls.push(game.newRectObject({
-                fillColor: '#000000',
-                position: point(0,0),
-                w: this.w, h: this.borderSize
-            }));
-            this.walls.push(game.newRectObject({
-                fillColor: '#000000',
-                position: point(0,0),
-                w: this.borderSize, h: this.h
-            }));
-            this.walls.push(game.newRectObject({
-                fillColor: '#000000',
-                position: point(0,2000-50),
-                w: this.w, h: this.borderSize
-            }));
-            this.walls.push(game.newRectObject({
-                fillColor: '#000000',
-                position: point(2000-50,0),
-                w: this.borderSize, h: this.h
-            }));
+            createWalls(this, getAllSides());
 
             var i;
 
@@ -58,6 +42,8 @@ function createGameLocation() {
                 this.buildings.push(createRandomBuilding(this));
             }
 
+            this.obstacles = this.findAllObstacles();
+
         },
         redrawLocation: function () {
             gameLocation.draw();
@@ -65,11 +51,19 @@ function createGameLocation() {
         },
 
         getPlayerStartPosition: function(){
-            return point(2000 - 200, 2000 - 200);
+            return OOP.randArrElement(this.buildings).getPositionC();
         },
 
         getPlacesArray: function() {
             return [this.spawns, this.buildings];
+        },
+
+        findAllObstacles: function () {
+            var obstacles = [this.walls];
+            this.buildings.forEach(function(building){
+               obstacles.push(building.walls);
+            });
+            return obstacles;
         }
 
     });
@@ -78,18 +72,23 @@ function createGameLocation() {
 
 /** Common functions */
 
+function isArrayOfArraysIntersect(obj, arrays) {
+    var flag = false;
+    arrays.forEach(function (array) {
+        if(flag !== false) return;
+        flag = obj.isArrIntersect(array);
+    });
+
+    return flag;
+}
+
 function checkPositionForIntersect(gameLocation, pos, objW, objH) {
     var newObj = game.newBaseObject({
             positionC: pos,
             w: objW, h: objH
-        }),
-        flag = false;
+        });
 
-    gameLocation.getPlacesArray().forEach(function (place) {
-        flag = newObj.isArrIntersect(place);
-        log(flag);
-    });
-    return flag;
+    return isArrayOfArraysIntersect(newObj, gameLocation.getPlacesArray());
 }
 
 function generateRandomPos(gameLocation, objW, objH) {
@@ -104,20 +103,62 @@ function findFreePos(gameLocation, objW, objH) {
 
     while(checkPositionForIntersect(gameLocation, pos, objW, objH)) {
         pos = generateRandomPos(gameLocation, objW, objH);
-        log("Try again");
     }
 
     return pos;
 }
 
+function getAllSides() {
+    return ["d", "r", "u", "l"];
+}
+
+function createWalls(obj, sides) {
+    if(sides === undefined){
+        sides = getAllSides();
+        OOP.insertRandArrElement(sides);
+    }
+
+    sides.forEach(function (side) {
+        switch (side){
+            case "d":
+                obj.walls.push(createWall(obj.x, obj.y + obj.h - obj.borderSize, obj.w, obj.borderSize));
+                break;
+            case "r":
+                obj.walls.push(createWall(obj.x + obj.w - obj.borderSize, obj.y, obj.borderSize, obj.h));
+                break;
+            case "u":
+                obj.walls.push(createWall(obj.x, obj.y, obj.w, obj.borderSize));
+                break;
+            case "l":
+                obj.walls.push(createWall(obj.x, obj.y, obj.borderSize, obj.h));
+                break;
+        }
+    });
+}
+
+function createWall(x, y, w, h) {
+    return game.newRectObject({
+        fillColor: '#000000',
+        position: point(x, y),
+        w: w, h: h
+    });
+}
+
 /** Building functions */
 function createBuilding(posC, w, h) {
-    return game.newRectObject({
+    var building = game.newRectObject({
         positionC: posC,
         w: w, h: h,
         fillColor: "#07ff00",
-        alpha: 0.3
+        alpha: 0.2
     });
+    building.setUserData({
+        borderSize: 20,
+        walls: []
+    });
+
+    createWalls(building);
+    return building;
 }
 
 function createRandomBuilding(gameLocation){
@@ -141,6 +182,6 @@ function createSpawn(posC, r) {
         positionC: posC,
         radius: r,
         fillColor: "#ff0600",
-        alpha: 0.3
+        alpha: 0.2
     })
 }
