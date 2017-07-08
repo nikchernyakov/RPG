@@ -24,28 +24,17 @@ pjs.system.setTitle('RPG.io'); // Set Title for Tab or Window
 
 var gameLocation = createGameLocation();
 gameLocation.fillRandomLocation();
-var player = createCharacter(gameLocation.getPlayerStartPosition());
+var player = createHero(gameLocation.getPlayerStartPosition(), getWarriorId());
 // Game Loop
 game.newLoopFromConstructor('start', function () {
-
-    var walls = [];
-    OOP.fillArr(walls, 100, function () {
-        return game.newRectObject({
-            position : point(math.random(0, 2000), math.random(0, 2000)),
-            fillColor : '#E77373',
-            w : math.random(20, 100), h : math.random(30, 100)
-        });
-    });
 
     this.update = function () {
         game.clear(); // clear screen
         gameLocation.redrawLocation();
         player.draw();
-        player.drawDynamicBox();
-        //OOP.drawArr(walls);
-        camera.follow(player, 20);
+        camera.follow(player.character, 20);
 
-        player.checkMoving(gameLocation.obstacles);
+        player.move();
 
     };
 
