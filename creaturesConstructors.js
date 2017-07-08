@@ -1,13 +1,13 @@
 function createCreature(pos) {
     var creature = game.newBaseObject({
-        position: pos
+        positionC: pos
     });
-    creature.setUserData(getCreature());
+    creature.setUserData(getCreatureProperties());
 
     return creature;
 }
 
-function getCreature() {
+function getCreatureProperties() {
     return {
         health : 100,
         setHealth : function (hp) {
@@ -25,22 +25,25 @@ function getCreature() {
 /** https://github.com/nikchernyakov/RPG/wiki/Character */
 function createCharacter(pos) {
     var character = game.newImageObject({
-        position: pos,
-        file: "imgs/icons/CharacterIcon.png"
+        positionC: pos,
+        file: "imgs/icons/CharacterIcon.png",
+        fillColor: "#004080",
+        w: 100, h: 100,
+        angle: -90
     });
     character.setBox({
         size: pjs.vector.size(-35, -35),
         offset : point(17, 17)
     });
-    character.setUserData(getCreature());
+    /*character.setPositionC(pjs.vector.pointMinus(character.getPosition(),
+        point(character.getBox().w/2, character.getBox().h/2)));*/
+    character.setUserData(getCreatureProperties());
     character.setUserData({
         level: 1,
         exp: 0,
-        gameClass: undefined,
         tasks: [],
         speed: 1,
-        abilities: [],
-        weapon: undefined,
+
         checkMoving: function (arrays) {
             var speed = 1,
                 angle,
@@ -61,17 +64,17 @@ function createCharacter(pos) {
                 }
             }
 
-            flag = false;
+            var flag1 = false;
             if (key.isDown('W')){
                 speed = 2;
-                flag = true;
+                flag1 = true;
 
             }
             else if (key.isDown('S')) {
                 speed = -1;
-                flag = true;
+                flag1 = true;
             }
-            if(flag){
+            if(flag1){
                 var pos = mouse.getPosition();
                 this.moveToC(pos, speed);
                 if(isArrayOfArraysIntersect(this, arrays)) {
@@ -80,6 +83,7 @@ function createCharacter(pos) {
             }
 
             this.rotateForPoint(mouse.getPosition(), 2);
+            return flag || flag1;
         }
     });
     return character;
