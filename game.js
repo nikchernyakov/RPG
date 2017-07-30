@@ -35,6 +35,8 @@ game.newLoopFromConstructor('start', function () {
         camera.follow(player.character, 20);
 
         player.move();
+        player.checkAbilities();
+        player.checkLoot();
 
     };
 
