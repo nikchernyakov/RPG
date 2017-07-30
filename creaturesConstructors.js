@@ -84,6 +84,10 @@ function createCharacter(pos) {
 
             this.rotateForPoint(mouse.getPosition(), 2);
             return flag || flag1;
+        },
+
+        isEatLoot: function(loot){
+            return this.isIntersect(loot);
         }
     });
     return character;
