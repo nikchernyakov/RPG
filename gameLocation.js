@@ -10,17 +10,22 @@ function createGameLocation() {
         borderSize: 50,
 
         spawns: [],
-        loots: [],
         blocks: [],
         buildings: [],
         walls: [],
         obstacles: [],
+        loots: [],
 
         drawAllObjects: function () {
             OOP.drawArr(this.walls);
             OOP.drawArr(this.blocks);
             OOP.drawArr(this.spawns);
             OOP.drawArr(this.loots);
+            this.loots.forEach(function (loot) {
+               loot.drawDynamicBox();
+            });
+                
+
             OOP.drawArr(this.buildings, function (building) {
                 OOP.drawArr(building.walls);
             });
@@ -32,16 +37,25 @@ function createGameLocation() {
 
             var i;
 
+            // Create spawns
             var spawnsCount = math.random(4, 6);
             for(i = 0; i < spawnsCount; i++) {
                 this.spawns.push(createRandomSpawn(this));
             }
 
+            // Create item
+            var lootsCount = math.random(30, 50);
+            for(i = 0; i < lootsCount; i++) {
+                this.loots.push(createRandomLoot(this));
+            }
+
+            // Create buildings
             var buildingsCount = math.random(2, 5);
             for(i = 0; i < buildingsCount; i++){
                 this.buildings.push(createRandomBuilding(this));
             }
 
+            // Find obstacles
             this.obstacles = this.findAllObstacles();
 
         },
@@ -82,30 +96,30 @@ function isArrayOfArraysIntersect(obj, arrays) {
     return flag;
 }
 
-function checkPositionForIntersect(gameLocation, pos, objW, objH) {
+function checkPositionForIntersect(pos, objW, objH, obstacles) {
     var newObj = game.newBaseObject({
             positionC: pos,
             w: objW, h: objH
         });
 
-    return isArrayOfArraysIntersect(newObj, gameLocation.getPlacesArray());
+    return isArrayOfArraysIntersect(newObj, obstacles);
 }
 
-function generateRandomPos(gameLocation, objW, objH) {
+function generateRandomPosC(gameLocation, objW, objH) {
     return point(math.random(gameLocation.borderSize + objW / 2,
             gameLocation.w - gameLocation.borderSize - objW / 2),
         math.random(gameLocation.borderSize + objH / 2,
             gameLocation.h - gameLocation.borderSize - objH / 2));
 }
 
-function findFreePos(gameLocation, objW, objH) {
-    var pos = generateRandomPos(gameLocation, objW, objH);
+function findFreePosC(gameLocation, objW, objH, obstacles) {
+    var posC = generateRandomPosC(gameLocation, objW, objH);
 
-    while(checkPositionForIntersect(gameLocation, pos, objW, objH)) {
-        pos = generateRandomPos(gameLocation, objW, objH);
+    while(checkPositionForIntersect(posC, objW, objH, obstacles)) {
+        posC = generateRandomPosC(gameLocation, objW, objH);
     }
 
-    return pos;
+    return posC;
 }
 
 function getAllSides() {
@@ -164,7 +178,7 @@ function createBuilding(posC, w, h) {
 function createRandomBuilding(gameLocation){
     var buildingW = math.random(300, 500),
         buildingH = math.random(300, 500),
-        buildingPosC = findFreePos(gameLocation, buildingW, buildingH);
+        buildingPosC = findFreePosC(gameLocation, buildingW, buildingH, gameLocation.getPlacesArray());
 
     return createBuilding(buildingPosC, buildingW, buildingH);
 }
@@ -172,7 +186,7 @@ function createRandomBuilding(gameLocation){
 /** Spawn functions */
 function createRandomSpawn(gameLocation) {
     var spawnRadius = math.random(100, 250),
-        spawnPosC = findFreePos(gameLocation, spawnRadius * 2, spawnRadius * 2);
+        spawnPosC = findFreePosC(gameLocation, spawnRadius * 2, spawnRadius * 2, gameLocation.getPlacesArray());
 
     return createSpawn(spawnPosC, spawnRadius);
 }
@@ -184,4 +198,28 @@ function createSpawn(posC, r) {
         fillColor: "#ff0600",
         alpha: 0.2
     })
+}
+
+/** Loot functions */
+function createRandomLoot(gameLocation) {
+    var lootData = getLootData(),
+        lootPosC = findFreePosC(gameLocation, lootData.w, lootData.h, gameLocation.obstacles),
+        lootAngle =  math.random(0, 360);
+
+    return createLoot(lootPosC, lootAngle);
+}
+
+function getLootData() {
+    return {
+        w: 40,
+        h: 20
+    };
+}
+
+function createLoot(posC, angle) {
+    return game.newImageObject({
+        positionC: posC,
+        angle: angle,
+        file: "imgs/icons/LootIcon.png"
+    });
 }
