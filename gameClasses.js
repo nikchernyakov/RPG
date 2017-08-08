@@ -22,15 +22,17 @@ function createHero(pos, gameClassId){
             this.weapon.setPositionC(pjs.vector.pointPlus(this.weapon.getPositionC(),
                 pjs.vector.pointMinus(this.character.getPositionC(), prevPos)));
 
-            if(!this.skills[0].inAnimation) {
-                this.weapon.setAngle(this.character.getAngle() + 90);
-            }
+            // Weapon angle move for character
             this.weapon.setPositionC(pjs.vector.getPointAngle(this.weapon.getPositionC(),
                 this.character.getPositionC(),
                 this.character.getAngle() - prevAngle));
+
+            // To set weapon along with character
+            this.weapon.setAngle(this.character.getAngle() + 90);
+
         },
         
-        checkAbilities: function () {
+        checkSkills: function () {
             if (!this.skills[0].inAnimation && mouse.isPress('LEFT')) {
                 this.skills[0].executeAnimation(this);
             }
@@ -41,7 +43,6 @@ function createHero(pos, gameClassId){
 
             if(this.character.isEatLoot(nearestLoot)){
                 OOP.delObject(gameLocation.loots, nearestLoot);
-                log("IN");
             }
         }
     };
@@ -87,8 +88,7 @@ function getWarriorAttackSkill(){
 
         executeAnimation: function (hero) {
             this.inAnimation = true;
-            hero.weapon.setAngle(hero.weapon.getAngle() + 90);
-            //hero.weapon.
+            //hero.weapon.circlingC(hero.character.getPositionC(), hero.character.radius, 1);
 
             var f = function (skill, bool) {
                 skill.inAnimation = bool;
