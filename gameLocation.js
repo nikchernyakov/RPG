@@ -19,12 +19,13 @@ function createGameLocation() {
         drawAllObjects: function () {
             OOP.drawArr(this.walls);
             OOP.drawArr(this.blocks);
+
             OOP.drawArr(this.spawns);
-            OOP.drawArr(this.loots);
-            this.loots.forEach(function (loot) {
-               loot.drawDynamicBox();
+            OOP.drawArr(this.spawns, function (spawn) {
+                OOP.drawArr(spawn.monsters);
             });
-                
+
+            OOP.drawArr(this.loots);
 
             OOP.drawArr(this.buildings, function (building) {
                 OOP.drawArr(building.walls);
@@ -78,6 +79,14 @@ function createGameLocation() {
                obstacles.push(building.walls);
             });
             return obstacles;
+        },
+
+        checkSpawns: function () {
+            this.spawns.forEach(function (spawn) {
+                if(spawn.monsters.length < spawn.monsterType.monsterCount){
+                    spawn.createMonsters(spawn.monsterType.monsterCount - spawn.monsters.length);
+                }
+            });
         }
 
     });
@@ -192,12 +201,76 @@ function createRandomSpawn(gameLocation) {
 }
 
 function createSpawn(posC, r) {
-    return game.newCircleObject({
+    var spawn = game.newCircleObject({
         positionC: posC,
         radius: r,
         fillColor: "#ff0600",
         alpha: 0.2
-    })
+    });
+
+    spawn.setUserData({
+        monsters: [],
+        monsterType: getRandomMonsterType(),
+        createMonsters: function (count) {
+            for(var i = 0; i < count; i++){
+                this.monsters.push(this.createMonster(this.monsterType.monsterClass));
+            }
+        },
+        createMonster: function (monsterClass) {
+            var monster = getMonsterData(monsterClass);
+            monster.setPositionC(this.getRandomPosC());
+            monster.setUserData(monsterClass);
+            return monster;
+        },
+        getRandomPosC: function () {
+            return point(math.random(this.getPositionC().x - this.radius,
+                    this.getPositionC().x + this.radius),
+                math.random(this.getPositionC().y - this.radius,
+                    this.getPositionC().y + this.radius));
+        }
+    });
+
+    return spawn;
+}
+
+function getRandomMonsterType() {
+    var monsterType = OOP.randArrElement(getMonsterTypes());
+    monsterType.monsterClass.fillColor = getRandomMonsterColor();
+    return monsterType;
+}
+
+function getMonsterTypes() {
+    var monsterTypes = [];
+    monsterTypes.push(getMonsterType1());
+    return monsterTypes;
+}
+
+function getMonsterData(monsterClass) {
+    var monsterData = game.newTriangleObject({
+        w: monsterClass.w, h: monsterClass.h,
+        fillColor: monsterClass.fillColor
+    });
+    monsterData.setUserData({
+
+    });
+    return monsterData;
+}
+
+function getMonsterType1() {
+    return {
+        monsterCount : 4,
+        monsterClass : {
+            w : 50, h: 50
+        }
+    };
+}
+
+function getRandomMonsterColor() {
+    var monstersColor = [];
+    monstersColor.push("#0411ff");
+    monstersColor.push("#840059");
+    monstersColor.push("#584700");
+    return OOP.randArrElement(monstersColor);
 }
 
 /** Loot functions */
