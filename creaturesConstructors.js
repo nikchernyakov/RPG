@@ -35,8 +35,6 @@ function createCharacter(pos) {
         size: pjs.vector.size(-35, -35),
         offset : point(17, 17)
     });
-    /*character.setPositionC(pjs.vector.pointMinus(character.getPosition(),
-        point(character.getBox().w/2, character.getBox().h/2)));*/
     character.setUserData(getCreatureProperties());
     character.setUserData({
         level: 1,
