@@ -31,12 +31,15 @@ game.newLoopFromConstructor('start', function () {
     this.update = function () {
         game.clear(); // clear screen
         gameLocation.redrawLocation();
+        gameLocation.checkSpawns();
+
         player.draw();
         camera.follow(player.character, 20);
 
         player.move();
-        player.checkAbilities();
+        player.checkSkills();
         player.checkLoot();
+
 
     };
 
