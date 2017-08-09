@@ -15,9 +15,7 @@ function getMonsterData(monsterClass) {
         w: monsterClass.w, h: monsterClass.h,
         fillColor: monsterClass.fillColor
     });
-    monsterData.setUserData({
-
-    });
+    monsterData.setUserData(getCreatureProperties());
     return monsterData;
 }
 
@@ -25,7 +23,8 @@ function getMonsterType1() {
     return {
         monsterCount : 4,
         monsterClass : {
-            w : 50, h: 50
+            w : 50, h: 50,
+            speed: 2
         }
     };
 }
