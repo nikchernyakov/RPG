@@ -49,19 +49,19 @@ function createGameLocation() {
             var i;
 
             // Create spawns
-            var spawnsCount = math.random(4, 6);
+            var spawnsCount = math.random(5, 5);
             for(i = 0; i < spawnsCount; i++) {
                 this.spawns.push(createRandomSpawn(this));
             }
 
             // Create item
-            var lootsCount = math.random(30, 50);
+            var lootsCount = math.random(40, 50);
             for(i = 0; i < lootsCount; i++) {
                 this.loots.push(createRandomLoot(this));
             }
 
             // Create buildings
-            var buildingsCount = math.random(2, 5);
+            var buildingsCount = math.random(3, 3);
             for(i = 0; i < buildingsCount; i++){
                 this.buildings.push(createRandomBuilding(this));
             }
@@ -203,7 +203,7 @@ function createRandomBuilding(gameLocation){
 
 /** Spawn functions */
 function createRandomSpawn(gameLocation) {
-    var spawnRadius = math.random(100, 250),
+    var spawnRadius = math.random(170, 250),
         spawnPosC = findFreePosC(gameLocation.getPositionC(), gameLocation.getWidthWithBorder(),
             gameLocation.getHeightWithBorder(), spawnRadius * 2, spawnRadius * 2, gameLocation.getPlacesArray());
 
@@ -232,12 +232,7 @@ function createSpawn(posC, r) {
                 monster.w, monster.h, [this.monsters]));
             monster.setUserData(monsterClass);
             return monster;
-        }/*,
-
-        getRandomPosC: function () {
-            return point(this.getPositionC().x + math.random(-this.radius, this.radius),
-                this.getPositionC().y + math.random(-this.radius, this.radius));
-        }*/
+        }
     });
 
     return spawn;
