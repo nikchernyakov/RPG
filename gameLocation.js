@@ -16,13 +16,23 @@ function createGameLocation() {
         obstacles: [],
         loots: [],
 
+        getWidthWithBorder: function () {
+            return this.w - this.borderSize;
+        },
+
+        getHeightWithBorder: function () {
+            return this.h - this.borderSize;
+        },
+
         drawAllObjects: function () {
             OOP.drawArr(this.walls);
             OOP.drawArr(this.blocks);
 
             OOP.drawArr(this.spawns);
             OOP.drawArr(this.spawns, function (spawn) {
-                OOP.drawArr(spawn.monsters);
+                OOP.drawArr(spawn.monsters, function (monster) {
+                    monster.drawDynamicBox();
+                });
             });
 
             OOP.drawArr(this.loots);
@@ -105,30 +115,28 @@ function isArrayOfArraysIntersect(obj, arrays) {
     return flag;
 }
 
-function checkPositionForIntersect(pos, objW, objH, obstacles) {
+function checkPositionForIntersect(posC, objW, objH, obstacles) {
     var newObj = game.newBaseObject({
-            positionC: pos,
+            positionC: posC,
             w: objW, h: objH
         });
 
     return isArrayOfArraysIntersect(newObj, obstacles);
 }
 
-function generateRandomPosC(gameLocation, objW, objH) {
-    return point(math.random(gameLocation.borderSize + objW / 2,
-            gameLocation.w - gameLocation.borderSize - objW / 2),
-        math.random(gameLocation.borderSize + objH / 2,
-            gameLocation.h - gameLocation.borderSize - objH / 2));
+function generateRandomPosC(posC, rangeX, rangeY, objW, objH) {
+    return point(posC.x + math.random(- rangeX / 2  + objW / 2, rangeX / 2 - objW / 2),
+        posC.y + math.random(- rangeY / 2 + objH / 2, rangeY / 2 - objH / 2));
 }
 
-function findFreePosC(gameLocation, objW, objH, obstacles) {
-    var posC = generateRandomPosC(gameLocation, objW, objH);
+function findFreePosC(posC, rangeX, rangeY, objW, objH, obstacles) {
+    var generatedPosC = generateRandomPosC(posC, rangeX, rangeY, objW, objH);
 
-    while(checkPositionForIntersect(posC, objW, objH, obstacles)) {
-        posC = generateRandomPosC(gameLocation, objW, objH);
+    while(checkPositionForIntersect(generatedPosC, objW, objH, obstacles)) {
+        generatedPosC = generateRandomPosC(posC, rangeX, rangeY, objW, objH);
     }
 
-    return posC;
+    return generatedPosC;
 }
 
 function getAllSides() {
@@ -187,7 +195,8 @@ function createBuilding(posC, w, h) {
 function createRandomBuilding(gameLocation){
     var buildingW = math.random(300, 500),
         buildingH = math.random(300, 500),
-        buildingPosC = findFreePosC(gameLocation, buildingW, buildingH, gameLocation.getPlacesArray());
+        buildingPosC = findFreePosC(gameLocation.getPositionC(), gameLocation.getWidthWithBorder(),
+            gameLocation.getHeightWithBorder(), buildingW, buildingH, gameLocation.getPlacesArray());
 
     return createBuilding(buildingPosC, buildingW, buildingH);
 }
@@ -195,7 +204,8 @@ function createRandomBuilding(gameLocation){
 /** Spawn functions */
 function createRandomSpawn(gameLocation) {
     var spawnRadius = math.random(100, 250),
-        spawnPosC = findFreePosC(gameLocation, spawnRadius * 2, spawnRadius * 2, gameLocation.getPlacesArray());
+        spawnPosC = findFreePosC(gameLocation.getPositionC(), gameLocation.getWidthWithBorder(),
+            gameLocation.getHeightWithBorder(), spawnRadius * 2, spawnRadius * 2, gameLocation.getPlacesArray());
 
     return createSpawn(spawnPosC, spawnRadius);
 }
@@ -218,64 +228,26 @@ function createSpawn(posC, r) {
         },
         createMonster: function (monsterClass) {
             var monster = getMonsterData(monsterClass);
-            monster.setPositionC(this.getRandomPosC());
+            monster.setPositionC(findFreePosC(this.getPositionC(), this.radius * 2, this.radius * 2,
+                monster.w, monster.h, [this.monsters]));
             monster.setUserData(monsterClass);
             return monster;
-        },
+        }/*,
 
         getRandomPosC: function () {
-            return point(this.getPositionC().x + math.random(-this.radius / 2, this.radius / 2),
-                this.getPositionC().y + math.random(-this.radius / 2, this.radius / 2));
-        }
+            return point(this.getPositionC().x + math.random(-this.radius, this.radius),
+                this.getPositionC().y + math.random(-this.radius, this.radius));
+        }*/
     });
 
     return spawn;
 }
 
-function getRandomMonsterType() {
-    var monsterType = OOP.randArrElement(getMonsterTypes());
-    monsterType.monsterClass.fillColor = getRandomMonsterColor();
-    return monsterType;
-}
-
-function getMonsterTypes() {
-    var monsterTypes = [];
-    monsterTypes.push(getMonsterType1());
-    return monsterTypes;
-}
-
-function getMonsterData(monsterClass) {
-    var monsterData = game.newTriangleObject({
-        w: monsterClass.w, h: monsterClass.h,
-        fillColor: monsterClass.fillColor
-    });
-    monsterData.setUserData({
-
-    });
-    return monsterData;
-}
-
-function getMonsterType1() {
-    return {
-        monsterCount : 4,
-        monsterClass : {
-            w : 50, h: 50
-        }
-    };
-}
-
-function getRandomMonsterColor() {
-    var monstersColor = [];
-    monstersColor.push("#0411ff");
-    monstersColor.push("#840059");
-    monstersColor.push("#584700");
-    return OOP.randArrElement(monstersColor);
-}
-
 /** Loot functions */
 function createRandomLoot(gameLocation) {
     var lootData = getLootData(),
-        lootPosC = findFreePosC(gameLocation, lootData.w, lootData.h, gameLocation.obstacles),
+        lootPosC = findFreePosC(gameLocation.getPositionC(), gameLocation.getWidthWithBorder(),
+            gameLocation.getHeightWithBorder(), lootData.w, lootData.h, gameLocation.obstacles),
         lootAngle =  math.random(0, 360);
 
     return createLoot(lootPosC, lootAngle);
