@@ -4,11 +4,14 @@ function createHero(pos, gameClassId){
         weapon: undefined,
         skills: undefined,
 
+        inAnimation: false,
+        weaponAnimation: undefined,
+
         draw: function () {
             this.character.draw();
-            this.weapon.draw();
-            /*this.character.drawDynamicBox();
-            this.weapon.drawDynamicBox();*/
+            this.drawWeapon();
+            //this.character.drawDynamicBox();
+            //this.weapon.drawDynamicBox();
         },
 
         move: function () {
@@ -30,10 +33,12 @@ function createHero(pos, gameClassId){
             // To set weapon along with character
             this.weapon.setAngle(this.character.getAngle() + 90);
 
+            //this.weapon.setPositionC(pjs.vector.pointMinus(this.character.getPositionC(), point(0, 45)));
+
         },
         
         checkSkills: function () {
-            if (!this.skills[0].inAnimation && mouse.isPress('LEFT')) {
+            if (!this.inAnimation && mouse.isPress('LEFT')) {
                 this.skills[0].executeAnimation(this);
             }
         },
@@ -44,6 +49,14 @@ function createHero(pos, gameClassId){
             if(this.character.isEatLoot(nearestLoot)){
                 OOP.delObject(gameLocation.loots, nearestLoot);
             }
+        },
+
+        drawWeapon: function () {
+            if(this.inAnimation && this.weaponAnimation !== undefined) {
+                this.weaponAnimation(this);
+            } else {
+                this.weapon.drawFrame(0);
+            }
         }
     };
 
@@ -53,7 +66,7 @@ function createHero(pos, gameClassId){
 function setGameClassProperties(hero, gameClassId) {
     switch (gameClassId){
         case getWarriorId():
-            hero.weapon = getWarriorWeaponFromPic(hero.character);
+            hero.weapon = getWarriorWeaponFromAnimationPic(hero.character);
             hero.skills = getWarriorSkills();
             break;
     }
@@ -75,6 +88,16 @@ function getWarriorWeaponFromPic(character){
     return weapon;
 }
 
+function getWarriorWeaponFromAnimationPic(character) {
+    var weapon = game.newAnimationObject({
+        positionC: pjs.vector.pointMinus(character.getPositionC(), point(0, 45)),
+        animation: pjs.tiles.newAnimation("imgs/weapons/WarriorWeaponAnimationLine.png", 270, 190, 12),
+        w: 270, h: 190,
+        delay: 0.1
+    });
+    return weapon;
+}
+
 function getWarriorSkills() {
     var skills = [];
 
@@ -84,17 +107,27 @@ function getWarriorSkills() {
 
 function getWarriorAttackSkill(){
     return {
-        inAnimation: false,
+        //inAnimation: false,
 
         executeAnimation: function (hero) {
-            this.inAnimation = true;
-            //hero.weapon.circlingC(hero.character.getPositionC(), hero.character.radius, 1);
+            hero.inAnimation = true;
+            hero.weaponAnimation = this.animation;
 
-            var f = function (skill, bool) {
-                skill.inAnimation = bool;
+            var f = function (hero, bool) {
+                hero.inAnimation = bool;
+                hero.weapon.drawToFrame(0);
             };
 
-            setTimeout(f, 3000, this, false);
+            setTimeout(f, 3000, hero, false);
+        },
+
+        animation: function (hero) {
+            //hero.weapon.drawReverFrames(0, 11);
+            if(hero.weapon.frame !== 11){
+                hero.weapon.drawToFrame(11);
+            } else {
+                hero.weapon.drawFrame(0);
+            }
         }
     }
 }
