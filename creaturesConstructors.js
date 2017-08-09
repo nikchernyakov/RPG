@@ -22,13 +22,26 @@ function getCreatureProperties() {
     };
 }
 
+function getCharacterProperties() {
+    return {
+        w: 100, h: 100,
+        getW : function () {
+            return this.w;
+        },
+        getH : function () {
+            return this.h;
+        }
+    }
+}
+
 /** https://github.com/nikchernyakov/RPG/wiki/Character */
 function createCharacter(pos) {
+    var characterProperties = getCharacterProperties();
     var character = game.newImageObject({
         positionC: pos,
         file: "imgs/icons/CharacterIcon.png",
         fillColor: "#004080",
-        w: 100, h: 100,
+        w: characterProperties.getW(), h: characterProperties.getH(),
         angle: -90
     });
     character.setBox({
