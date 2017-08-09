@@ -215,7 +215,7 @@ function createSpawn(posC, r) {
         positionC: posC,
         radius: r,
         fillColor: "#ff0600",
-        alpha: 0.2
+        alpha: 0.15
     });
 
     spawn.setUserData({
