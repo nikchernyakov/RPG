@@ -222,11 +222,10 @@ function createSpawn(posC, r) {
             monster.setUserData(monsterClass);
             return monster;
         },
+
         getRandomPosC: function () {
-            return point(math.random(this.getPositionC().x - this.radius,
-                    this.getPositionC().x + this.radius),
-                math.random(this.getPositionC().y - this.radius,
-                    this.getPositionC().y + this.radius));
+            return point(this.getPositionC().x + math.random(-this.radius / 2, this.radius / 2),
+                this.getPositionC().y + math.random(-this.radius / 2, this.radius / 2));
         }
     });
 
