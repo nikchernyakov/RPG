@@ -7,8 +7,8 @@ function createHero(pos, gameClassId){
         draw: function () {
             this.character.draw();
             this.weapon.draw();
-            this.character.drawDynamicBox();
-            this.weapon.drawDynamicBox();
+            /*this.character.drawDynamicBox();
+            this.weapon.drawDynamicBox();*/
         },
 
         move: function () {
@@ -67,7 +67,7 @@ function getWarriorId() {
 function getWarriorWeaponFromPic(character){
     var weapon = game.newImageObject({
         position: pjs.vector.pointPlus(character.getPosition(), point(character.w, 0)),
-        file: "imgs/weapons/sword_pixel.png",
+        file: "imgs/weapons/sword_pic_1.png",
         fillColor: "#004080",
         w: 35, h: 70
     });
