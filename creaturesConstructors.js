@@ -18,7 +18,11 @@ function getCreatureProperties() {
         },
         decreaseHealth : function (hp) {
             this.health -= hp;
-        }
+        },
+
+        level: 1,
+        exp: 0,
+        speed: 1
     };
 }
 
@@ -50,10 +54,8 @@ function createCharacter(pos) {
     });
     character.setUserData(getCreatureProperties());
     character.setUserData({
-        level: 1,
-        exp: 0,
+
         tasks: [],
-        speed: 1,
 
         checkMoving: function (arrays) {
             var speed = 1,
