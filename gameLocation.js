@@ -28,18 +28,18 @@ function createGameLocation() {
             OOP.drawArr(this.walls);
             OOP.drawArr(this.blocks);
 
-            OOP.drawArr(this.spawns);
-            OOP.drawArr(this.spawns, function (spawn) {
-                OOP.drawArr(spawn.monsters, function (monster) {
-                    monster.drawDynamicBox();
-                });
-            });
-
-            OOP.drawArr(this.loots);
-
             OOP.drawArr(this.buildings, function (building) {
                 OOP.drawArr(building.walls);
             });
+
+            OOP.drawArr(this.spawns);
+
+            OOP.drawArr(this.loots);
+
+            OOP.drawArr(this.spawns, function (spawn) {
+                OOP.drawArr(spawn.monsters);
+            });
+
         },
 
         fillRandomLocation: function () {
@@ -229,7 +229,7 @@ function createSpawn(posC, r) {
         },
         createMonster: function (monsterClass) {
             var monster = getMonsterData(monsterClass);
-            monster.setPositionC(findFreePosC(this.getPositionC(), this.radius * 2, this.radius * 2,
+            monster.setPositionC(findFreePosC(this.getPositionC(), this.radius * Math.sqrt(3), this.radius * Math.sqrt(3),
                 monster.w, monster.h, [this.monsters]));
             monster.setUserData(monsterClass);
             return monster;
