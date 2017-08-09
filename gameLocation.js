@@ -196,7 +196,8 @@ function createRandomBuilding(gameLocation){
     var buildingW = math.random(300, 500),
         buildingH = math.random(300, 500),
         buildingPosC = findFreePosC(gameLocation.getPositionC(), gameLocation.getWidthWithBorder(),
-            gameLocation.getHeightWithBorder(), buildingW, buildingH, gameLocation.getPlacesArray());
+            gameLocation.getHeightWithBorder(), buildingW + getCharacterProperties().getW(),
+            buildingH + getCharacterProperties().getH(), gameLocation.getPlacesArray());
 
     return createBuilding(buildingPosC, buildingW, buildingH);
 }
