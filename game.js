@@ -5,6 +5,7 @@ pjs.system.initFullPage(); // for Full Page mode
 
 var log    = pjs.system.log;     // log = console.log;
 var game   = pjs.game;           // Game Manager
+var vector  = pjs.vector;   // Constructor for Vector
 var point  = pjs.vector.point;   // Constructor for Point
 var camera = pjs.camera;         // Camera Manager
 var brush  = pjs.brush;          // Brush, used for simple drawing
