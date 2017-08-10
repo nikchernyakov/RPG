@@ -38,8 +38,10 @@ function createHero(pos, gameClassId){
         },
         
         checkSkills: function () {
-            if (!this.inAnimation && mouse.isPress('LEFT')) {
-                this.skills[0].executeAnimation(this);
+            if (!this.inAnimation) {
+                if (mouse.isPress('LEFT')) {
+                    this.skills[0].executeAnimation(this);
+                }
             }
         },
 
@@ -117,6 +119,7 @@ function getWarriorAttackSkill(){
     return {
         //inAnimation: false,
 
+
         executeAnimation: function (hero) {
             hero.inAnimation = true;
             hero.weaponAnimation = this.animation;
@@ -130,17 +133,17 @@ function getWarriorAttackSkill(){
         },
 
         animation: function (hero) {
-            //hero.weapon.drawReverFrames(0, 11);
-            /*if(hero.weapon.frame !== 11){
-                hero.weapon.drawToFrame(11);
-            } else {
-                hero.weapon.drawFrame(0);
-            }*/
+            hero.weapon.draw();
+
             if(hero.weapon.frame === hero.weapon.frameCount - 1){
                 hero.endAnimation();
-                hero.weapon.drawToFrame(0);
+                hero.weapon.draw();
             }
-            hero.weapon.drawToFrame(hero.weapon.frameCount - 1);
+
         }
+
+        /*getAnimation: function () {
+            return hero.weapon.getAnima
+        }*/
     }
 }
