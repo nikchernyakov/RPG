@@ -48,7 +48,7 @@ function createHero(pos, gameClassId){
         checkLoot: function () {
             var nearestLoot = this.character.getNearest(gameLocation.loots);
 
-            if(this.character.isEatLoot(nearestLoot)){
+            if(nearestLoot !== undefined && this.character.isEatLoot(nearestLoot)){
                 OOP.delObject(gameLocation.loots, nearestLoot);
             }
         },
