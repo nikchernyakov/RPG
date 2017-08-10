@@ -57,6 +57,11 @@ function createHero(pos, gameClassId){
             } else {
                 this.weapon.drawFrame(0);
             }
+        },
+
+        endAnimation: function () {
+            this.inAnimation = false;
+            this.weaponAnimation = undefined;
         }
     };
 
@@ -91,9 +96,12 @@ function getWarriorWeaponFromPic(character){
 function getWarriorWeaponFromAnimationPic(character) {
     var weapon = game.newAnimationObject({
         positionC: pjs.vector.pointMinus(character.getPositionC(), point(0, 45)),
-        animation: pjs.tiles.newAnimation("imgs/weapons/WarriorWeaponAnimationLine.png", 270, 190, 12),
+        animation: pjs.tiles.newAnimation("imgs/weapons/WarriorWeaponAnimationLine2.png", 270, 190, 21),
         w: 270, h: 190,
-        delay: 0.1
+        delay: 0.5
+    });
+    weapon.setUserData({
+       frameCount: 21
     });
     return weapon;
 }
@@ -113,21 +121,26 @@ function getWarriorAttackSkill(){
             hero.inAnimation = true;
             hero.weaponAnimation = this.animation;
 
-            var f = function (hero, bool) {
+            /*var f = function (hero, bool) {
                 hero.inAnimation = bool;
-                hero.weapon.drawToFrame(0);
+
             };
 
-            setTimeout(f, 3000, hero, false);
+            setTimeout(f, 700, hero, false);*/
         },
 
         animation: function (hero) {
             //hero.weapon.drawReverFrames(0, 11);
-            if(hero.weapon.frame !== 11){
+            /*if(hero.weapon.frame !== 11){
                 hero.weapon.drawToFrame(11);
             } else {
                 hero.weapon.drawFrame(0);
+            }*/
+            if(hero.weapon.frame === hero.weapon.frameCount - 1){
+                hero.endAnimation();
+                hero.weapon.drawToFrame(0);
             }
+            hero.weapon.drawToFrame(hero.weapon.frameCount - 1);
         }
     }
 }
