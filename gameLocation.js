@@ -17,11 +17,12 @@ function createGameLocation() {
         loots: [],
 
         getWidthWithBorder: function () {
-            return this.w - this.borderSize;
+            return this.w - this.borderSize * 2;
         },
 
         getHeightWithBorder: function () {
-            return this.h - this.borderSize;
+            return this.h - this.borderSize * 2
+                ;
         },
 
         drawAllObjects: function () {
