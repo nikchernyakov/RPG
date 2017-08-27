@@ -107,13 +107,13 @@ function createGameLocation() {
 /** Common functions */
 
 function isArrayOfArraysIntersect(obj, arrays) {
-    var flag = false;
+    var intersection = false;
     arrays.forEach(function (array) {
-        if(flag !== false) return;
-        flag = obj.isArrIntersect(array);
+        if(intersection !== false) return;
+        intersection = obj.isArrIntersect(array);
     });
 
-    return flag;
+    return intersection;
 }
 
 function checkPositionForIntersect(posC, objW, objH, obstacles) {
