@@ -57,46 +57,35 @@ function createCharacter(pos) {
 
         tasks: [],
 
-        checkMoving: function (arrays) {
-            var speed = 1,
-                angle,
-                flag = false;
+        checkMoving: function (obstaclesArray) {
+            var speed = 0,
+                angle = 0;
 
-            if (key.isDown('A')) {
-                angle = -90;
-                flag = true;
-            } else if (key.isDown('D')) {
-                angle = 90;
-                flag = true;
-            }
-            if(flag){
-                var angle2Points = pjs.vector.getAngle2Points(this.getPositionC(), mouse.getPosition());
-                this.moveAngle(speed, angle2Points + angle);
-                if(isArrayOfArraysIntersect(this, arrays)){
-                    this.moveAngle(speed, angle2Points - angle);
-                }
-            }
-
-            var flag1 = false;
             if (key.isDown('W')){
                 speed = 2;
-                flag1 = true;
-
             }
             else if (key.isDown('S')) {
                 speed = -1;
-                flag1 = true;
             }
-            if(flag1){
-                var pos = mouse.getPosition();
-                this.moveToC(pos, speed);
-                if(isArrayOfArraysIntersect(this, arrays)) {
-                    this.moveToC(pos, -speed);
+            else if (key.isDown('A')) {
+                speed = 1;
+                angle = -90;
+            } else if (key.isDown('D')) {
+                speed = 1;
+                angle = 90;
+            }
+
+            if(speed !== 0){
+                var angle2Points = pjs.vector.getAngle2Points(this.getPositionC(), mouse.getPosition());
+                this.moveAngle(speed, angle2Points + angle);
+                var intersection;
+                if(intersection = isArrayOfArraysIntersect(this, obstaclesArray)){
+                    this.moveAngle(-speed, angle2Points + angle);
                 }
             }
 
             this.rotateForPoint(mouse.getPosition(), 2);
-            return flag || flag1;
+            return speed !== 0;
         },
 
         isEatLoot: function(loot){
