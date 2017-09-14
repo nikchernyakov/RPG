@@ -110,40 +110,6 @@ function createGameLocation() {
     return gameLocation;
 }
 
-/** Common functions */
-
-function fixAngle(angle) {
-    if(angle < 0){
-        angle += 360;
-    }
-    angle %= 360;
-    return angle;
-}
-
-function pushArrayInArray(array, elements){
-    elements.forEach(function(element){
-        array.push(element);
-    });
-}
-
-function getIntersectionArray(obj, array) {
-    var resultArray = [];
-    array.forEach(function (element) {
-        if(obj.isIntersect(element))
-            resultArray.push(element);
-    });
-    return resultArray;
-}
-/*function isArrayOfArraysIntersect(obj, arrays) {
-    var intersection = false;
-    arrays.forEach(function (array) {
-        if(intersection !== false) return;
-        intersection = obj.isArrIntersect(array);
-    });
-
-    return intersection;
-}*/
-
 function checkPositionForIntersect(posC, objW, objH, obstacles) {
     var newObj = game.newBaseObject({
             positionC: posC,
@@ -181,45 +147,45 @@ function createWalls(obj, sides) {
     sides.forEach(function (side) {
         switch (side){
             case "d":
-                obj.walls.push(createWall(obj.x, obj.y + obj.h - obj.borderSize, obj.w, obj.borderSize));
+                obj.walls.push(new GameWall(obj.x, obj.y + obj.h - obj.borderSize, obj.w, obj.borderSize));
                 break;
             case "r":
-                obj.walls.push(createWall(obj.x + obj.w - obj.borderSize, obj.y, obj.borderSize, obj.h));
+                obj.walls.push(new GameWall(obj.x + obj.w - obj.borderSize, obj.y, obj.borderSize, obj.h));
                 break;
             case "u":
-                obj.walls.push(createWall(obj.x, obj.y, obj.w, obj.borderSize));
+                obj.walls.push(new GameWall(obj.x, obj.y, obj.w, obj.borderSize));
                 break;
             case "l":
-                obj.walls.push(createWall(obj.x, obj.y, obj.borderSize, obj.h));
+                obj.walls.push(new GameWall(obj.x, obj.y, obj.borderSize, obj.h));
                 break;
         }
     });
 }
 
-function createWall(x, y, w, h) {
-    return game.newRectObject({
+var GameWall = function (x, y, w, h) {
+    var wall = game.newRectObject({
         fillColor: '#000000',
         position: point(x, y),
         w: w, h: h
     });
-}
+    inherit(this, wall, GameObject);
+};
 
 /** Building functions */
-function createBuilding(posC, w, h) {
-    var building = game.newRectObject({
+var GameBuilding = function(posC, w, h){
+    var rectObject = game.newRectObject({
         positionC: posC,
         w: w, h: h,
         fillColor: "#07ff00",
         alpha: 0.2
     });
-    building.setUserData({
-        borderSize: 20,
-        walls: []
-    });
+    inherit(this, rectObject, GameObject);
 
-    createWalls(building);
-    return building;
-}
+    this.borderSize = 20;
+    this.walls = [];
+
+    createWalls(this);
+};
 
 function createRandomBuilding(gameLocation){
     var buildingW = math.random(300, 500),
@@ -228,7 +194,7 @@ function createRandomBuilding(gameLocation){
             gameLocation.getHeightWithBorder(), buildingW + getCharacterProperties().getW(),
             buildingH + getCharacterProperties().getH(), gameLocation.getPlacesArray());*/ gameLocation.getPositionC();
 
-    return createBuilding(buildingPosC, buildingW, buildingH);
+    return new GameBuilding(buildingPosC, buildingW, buildingH);
 }
 
 /** Spawn functions */
@@ -237,36 +203,35 @@ function createRandomSpawn(gameLocation) {
         spawnPosC = findFreePosC(gameLocation.getPositionC(), gameLocation.getWidthWithBorder(),
             gameLocation.getHeightWithBorder(), spawnRadius * 2, spawnRadius * 2, gameLocation.getPlacesArray());
 
-    return createSpawn(spawnPosC, spawnRadius);
+    return new GameSpawn(spawnPosC, spawnRadius);
 }
 
-function createSpawn(posC, r) {
-    var spawn = game.newCircleObject({
+var GameSpawn = function (posC, r) {
+    var circleObject = game.newCircleObject({
         positionC: posC,
         radius: r,
         fillColor: "#ff0600",
         alpha: 0.15
     });
+    inherit(this, circleObject, GameObject);
 
-    spawn.setUserData({
-        monsters: [],
-        monsterType: getRandomMonsterType(),
-        createMonsters: function (count) {
-            for(var i = 0; i < count; i++){
-                this.monsters.push(this.createMonster(this.monsterType.monsterClass));
-            }
-        },
-        createMonster: function (monsterClass) {
-            var monster = getMonsterData(monsterClass);
-            monster.setPositionC(findFreePosC(this.getPositionC(), this.radius * Math.sqrt(3), this.radius * Math.sqrt(3),
-                monster.w, monster.h, [this.monsters]));
-            monster.setUserData(monsterClass);
-            return monster;
+    this.monsters = [];
+    this.monsterType = getRandomMonsterType();
+
+    this.createMonsters = function (count) {
+        for(var i = 0; i < count; i++){
+            this.monsters.push(this.createMonster(this.monsterType.monsterClass));
         }
-    });
+    };
 
-    return spawn;
-}
+    this.createMonster = function (monsterClass) {
+        var monster = getMonsterData(monsterClass);
+        monster.setPositionC(findFreePosC(this.getPositionC(), this.radius * Math.sqrt(3), this.radius * Math.sqrt(3),
+            monster.w, monster.h, [this.monsters]));
+        monster.setUserData(monsterClass);
+        return monster;
+    };
+};
 
 /** Loot functions */
 function createRandomLoot(gameLocation) {
@@ -275,7 +240,7 @@ function createRandomLoot(gameLocation) {
             gameLocation.getHeightWithBorder(), lootData.w, lootData.h, gameLocation.obstacles),
         lootAngle =  math.random(0, 360);
 
-    return createLoot(lootPosC, lootAngle);
+    return new GameLoot(lootPosC, lootAngle);
 }
 
 function getLootData() {
@@ -285,10 +250,11 @@ function getLootData() {
     };
 }
 
-function createLoot(posC, angle) {
-    return game.newImageObject({
+var GameLoot = function(posC, angle) {
+    var loot = game.newImageObject({
         positionC: posC,
         angle: angle,
         file: "imgs/icons/LootIcon.png"
     });
-}
+    inherit(this, loot, GameObject);
+};
