@@ -49,8 +49,14 @@ function createGameLocation() {
 
             var i;
 
+            // Create buildings
+            var buildingsCount = 1;
+            for(i = 0; i < buildingsCount; i++){
+                this.buildings.push(createRandomBuilding(this));
+            }
+
             // Create spawns
-            var spawnsCount = math.random(5, 5);
+            var spawnsCount = 3;
             for(i = 0; i < spawnsCount; i++) {
                 this.spawns.push(createRandomSpawn(this));
             }
@@ -61,11 +67,7 @@ function createGameLocation() {
                 this.loots.push(createRandomLoot(this));
             }
 
-            // Create buildings
-            var buildingsCount = math.random(3, 3);
-            for(i = 0; i < buildingsCount; i++){
-                this.buildings.push(createRandomBuilding(this));
-            }
+
 
             // Find obstacles
             this.obstacles = this.findAllObstacles();
@@ -81,13 +83,17 @@ function createGameLocation() {
         },
 
         getPlacesArray: function() {
-            return [this.spawns, this.buildings];
+            var places = [];
+            pushArrayInArray(places, this.spawns);
+            pushArrayInArray(places, this.buildings);
+            return places;
         },
 
         findAllObstacles: function () {
-            var obstacles = [this.walls];
+            var obstacles = [];
+            pushArrayInArray(obstacles, this.walls);
             this.buildings.forEach(function(building){
-               obstacles.push(building.walls);
+                pushArrayInArray(obstacles, building.walls);
             });
             return obstacles;
         },
@@ -106,7 +112,29 @@ function createGameLocation() {
 
 /** Common functions */
 
-function isArrayOfArraysIntersect(obj, arrays) {
+function fixAngle(angle) {
+    if(angle < 0){
+        angle += 360;
+    }
+    angle %= 360;
+    return angle;
+}
+
+function pushArrayInArray(array, elements){
+    elements.forEach(function(element){
+        array.push(element);
+    });
+}
+
+function getIntersectionArray(obj, array) {
+    var resultArray = [];
+    array.forEach(function (element) {
+        if(obj.isIntersect(element))
+            resultArray.push(element);
+    });
+    return resultArray;
+}
+/*function isArrayOfArraysIntersect(obj, arrays) {
     var intersection = false;
     arrays.forEach(function (array) {
         if(intersection !== false) return;
@@ -114,7 +142,7 @@ function isArrayOfArraysIntersect(obj, arrays) {
     });
 
     return intersection;
-}
+}*/
 
 function checkPositionForIntersect(posC, objW, objH, obstacles) {
     var newObj = game.newBaseObject({
@@ -122,7 +150,7 @@ function checkPositionForIntersect(posC, objW, objH, obstacles) {
             w: objW, h: objH
         });
 
-    return isArrayOfArraysIntersect(newObj, obstacles);
+    return newObj.isArrIntersect(obstacles);
 }
 
 function generateRandomPosC(posC, rangeX, rangeY, objW, objH) {
@@ -196,9 +224,9 @@ function createBuilding(posC, w, h) {
 function createRandomBuilding(gameLocation){
     var buildingW = math.random(300, 500),
         buildingH = math.random(300, 500),
-        buildingPosC = findFreePosC(gameLocation.getPositionC(), gameLocation.getWidthWithBorder(),
+        buildingPosC = /*findFreePosC(gameLocation.getPositionC(), gameLocation.getWidthWithBorder(),
             gameLocation.getHeightWithBorder(), buildingW + getCharacterProperties().getW(),
-            buildingH + getCharacterProperties().getH(), gameLocation.getPlacesArray());
+            buildingH + getCharacterProperties().getH(), gameLocation.getPlacesArray());*/ gameLocation.getPositionC();
 
     return createBuilding(buildingPosC, buildingW, buildingH);
 }
