@@ -1,6 +1,6 @@
 function createHero(pos, gameClassId){
     var hero = {
-        character: createCharacter(pos),
+        character: new GameCharacter(pos),
         weapon: undefined,
         skills: undefined,
 
@@ -22,11 +22,11 @@ function createHero(pos, gameClassId){
             this.character.checkMoving(gameLocation.obstacles);
 
             // Weapon move for character
-            this.weapon.setPositionC(pjs.vector.pointPlus(this.weapon.getPositionC(),
+            this.weapon.setPositionC(vector.pointPlus(this.weapon.getPositionC(),
                 pjs.vector.pointMinus(this.character.getPositionC(), prevPos)));
 
             // Weapon angle move for character
-            this.weapon.setPositionC(pjs.vector.getPointAngle(this.weapon.getPositionC(),
+            this.weapon.setPositionC(vector.getPointAngle(this.weapon.getPositionC(),
                 this.character.getPositionC(),
                 this.character.getAngle() - prevAngle));
 
@@ -117,19 +117,10 @@ function getWarriorSkills() {
 
 function getWarriorAttackSkill(){
     return {
-        //inAnimation: false,
-
-
         executeAnimation: function (hero) {
             hero.inAnimation = true;
             hero.weaponAnimation = this.animation;
 
-            /*var f = function (hero, bool) {
-                hero.inAnimation = bool;
-
-            };
-
-            setTimeout(f, 700, hero, false);*/
         },
 
         animation: function (hero) {
