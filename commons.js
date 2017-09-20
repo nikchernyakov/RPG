@@ -15,10 +15,12 @@ function pushArrayInArray(array, elements){
 }
 
 function getIntersectionArray(obj, array) {
-    var resultArray = [];
+    var resultArray = [],
+        objCornerPoints = obj.getCornerPoints();
     array.forEach(function (element) {
-        if(obj.isIntersect(element))
+        if(obj.isPointIntersect(objCornerPoints, element)) {
             resultArray.push(element);
+        }
     });
     return resultArray;
 }
@@ -33,8 +35,6 @@ function getIntersectionArray(obj, array) {
  return intersection;
  }*/
 
-function inherit(ChildClass, ParentObject, ParentClass) {
-    ChildClass.prototype = ParentObject;
-    ChildClass.prototype.prototype = new ParentClass();
-    ChildClass.__proto__ = ChildClass.prototype;
+function inherit(thisChild, pjsObject, ParentClass) {
+    thisChild.__proto__ = new ParentClass(pjsObject);
 }
