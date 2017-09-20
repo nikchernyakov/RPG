@@ -1,6 +1,5 @@
-var GameCreature = function(properties) {
-    this.prototype = new GameObject(properties);
-    this.__proto__ = this.prototype;
+var GameCreature = function(pjsObject) {
+    inherit(this, pjsObject, GameObject);
 
     this.health = 1;
     this.setHealth = function (hp) {
@@ -39,9 +38,16 @@ function getCreatureProperties() {
     return creatureProperties;
 }
 
+/** https://github.com/nikchernyakov/RPG/wiki/Character */
 var GameCharacter = function(posC) {
     var characterProperties = getCharacterProperties(posC);
     inherit(this, game.newImageObject(characterProperties), GameCreature);
+
+    //this.cornerPoints = getCircleCornerPoints(posC, this.w / 2);
+    this.getCornerPoints = function () {
+        return getCircleCornerPoints(this.getPositionC(), this.w / 2);
+    };
+    this.isPointIn = isPointInCircle;
 
     this.tasks = [];
     this.lowSpeed = 1;
@@ -49,44 +55,28 @@ var GameCharacter = function(posC) {
 
     this.checkMoving = function (obstaclesArray) {
         var speed = 0,
-            angle = 0,
-            frontBox = game.newRectObject({
-                positionC: this.getPositionC(),
-                w: this.w - 20, h: this.h - 15,
-                angle: this.getAngle() + 90
-            });
+            angle = 0;
 
         if (key.isDown('W')){
             speed = this.highSpeed;
-            frontBox.h /= 3;
-            frontBox.h *= 2;
         }
         else if (key.isDown('S')) {
             speed = -this.lowSpeed;
             //angle = -180;
-            frontBox.h /= 2;
-            frontBox.y += this.h / 2;
         }
         else if (key.isDown('A')) {
             speed = this.lowSpeed;
             angle = -90;
-            frontBox.w /= 2;
         } else if (key.isDown('D')) {
             speed = this.lowSpeed;
             angle = 90;
-            frontBox.w /= 2;
-            frontBox.x += this.w / 2;
         }
-
-
-        frontBox.setPositionC(vector.getPointAngle(frontBox.getPositionC(), this.getPositionC(), this.getAngle() + 90));
-        frontBox.drawDynamicBox();
 
         if(speed !== 0){
             var angle2Points = vector.getAngle2Points(this.getPositionC(), mouse.getPosition()),
                 angleWithShift = fixAngle(angle2Points + angle);
             this.moveAngle(speed, angleWithShift);
-            var intersectionArray = getIntersectionArray(frontBox, obstaclesArray);
+            var intersectionArray = getIntersectionArray(this, obstaclesArray);
             if(intersectionArray.length > 0){
                 this.moveAngle(-speed, angleWithShift);
 
@@ -168,11 +158,4 @@ function getCharacterProperties(posC) {
             offset : point(15, 15)
         }
     }
-}
-
-/** https://github.com/nikchernyakov/RPG/wiki/Character */
-function createCharacter(posC) {
-    return new GameCharacter({
-        positionC : posC
-    }.positionC);
 }
