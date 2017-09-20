@@ -67,8 +67,6 @@ function createGameLocation() {
                 this.loots.push(createRandomLoot(this));
             }
 
-
-
             // Find obstacles
             this.obstacles = this.findAllObstacles();
 
@@ -169,6 +167,8 @@ var GameWall = function (x, y, w, h) {
         w: w, h: h
     });
     inherit(this, wall, GameObject);
+
+    this.cornerPoints = getRectangleCornerPoints(wall.getPositionC(), w, h);
 };
 
 /** Building functions */
@@ -181,6 +181,7 @@ var GameBuilding = function(posC, w, h){
     });
     inherit(this, rectObject, GameObject);
 
+    this.cornerPoints = getRectangleCornerPoints(posC, w, h);
     this.borderSize = 20;
     this.walls = [];
 
@@ -257,4 +258,7 @@ var GameLoot = function(posC, angle) {
         file: "imgs/icons/LootIcon.png"
     });
     inherit(this, loot, GameObject);
+
+    var lootData = getLootData();
+    this.cornerPoints = getRectangleCornerPoints(posC, lootData.w, lootData.h);
 };
