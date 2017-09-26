@@ -50,8 +50,8 @@ var GameCharacter = function(posC) {
     this.isPointIn = isPointInCircle;
 
     this.tasks = [];
-    this.lowSpeed = 1;
-    this.highSpeed = 2;
+    this.lowSpeed = 1.5;
+    this.highSpeed = 2.5;
 
     this.checkMoving = function (obstaclesArray) {
         var speed = 0,
@@ -61,8 +61,8 @@ var GameCharacter = function(posC) {
             speed = this.highSpeed;
         }
         else if (key.isDown('S')) {
-            speed = -this.lowSpeed;
-            //angle = -180;
+            speed = this.lowSpeed;
+            angle = -180;
         }
         else if (key.isDown('A')) {
             speed = this.lowSpeed;
@@ -73,7 +73,7 @@ var GameCharacter = function(posC) {
         }
 
         if(speed !== 0){
-            var angle2Points = vector.getAngle2Points(this.getPositionC(), mouse.getPosition()),
+            var angle2Points = fixAngle(vector.getAngle2Points(this.getPositionC(), mouse.getPosition())),
                 angleWithShift = fixAngle(angle2Points + angle);
             this.moveAngle(speed, angleWithShift);
             var intersectionArray = getIntersectionArray(this, obstaclesArray);
@@ -102,8 +102,8 @@ var GameCharacter = function(posC) {
         // Find side
         if(posC.y > obstacleA.y && posC.y < obstacleD.y){
             if(posC.x < obstacleA.x) {
-                point1 = obstacleC;
-                point2 = obstacleA;
+                point1 = obstacleA;
+                point2 = obstacleC;
             } else if(posC.x > obstacleD.x){
                 point1 = obstacleD;
                 point2 = obstacleB;
@@ -119,10 +119,30 @@ var GameCharacter = function(posC) {
         }
 
         // Select direction and move character
-        var pointFrom, pointTo;
         if(point1 && point2){
-            if(fixAngle(fixAngle(vector.getAngle2Points(posC, point1)) - angle)
-                < fixAngle(angle - fixAngle(vector.getAngle2Points(posC, point2)))){
+            var pointFrom, pointTo;
+            var v1 = vector.pointMinus(point2, point1),
+                v2 = vector.pointMinus(posC, point1);
+
+            // Determine from what side stand point for line (left or right)
+            // If left change rotation
+            if(v1.x * v2.y - v1.y * v2.x > 0){
+                var p = point1;
+                point1 = point2;
+                point2 = p;
+            }
+
+
+            var lineAngle = fixAngle(fixAngle(vector.getAngle2Points(point1, point2)) + 90),
+                angleWithShift = angle,
+                reverseAngle = (fixAngle(angle - 180));
+            if(lineAngle > 180){
+                angleWithShift += 360 * (reverseAngle > angle);
+            } else if(lineAngle < 180){
+                angleWithShift -= 360 * (reverseAngle < angle);
+            }
+
+            if(angleWithShift > lineAngle){
                 pointFrom = point2;
                 pointTo = point1;
             } else {
@@ -130,7 +150,7 @@ var GameCharacter = function(posC) {
                 pointTo = point2;
             }
 
-            var direction = vector.getAngle2Points(pointFrom, pointTo);
+            var direction = fixAngle(vector.getAngle2Points(pointFrom, pointTo));
             this.moveAngle(speed, direction);
         }
     };
