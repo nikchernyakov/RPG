@@ -42,14 +42,14 @@ game.newLoopFromConstructor('start', function () {
         player.checkLoot();
 
         /*brush.drawText({
-            x: mouse.getPosition().x, y: mouse.getPosition().y,
-            text : 'FPS: ' + game.getFPS(),
-            size : 30,
-            color : 'black',
-            strokeColor : 'white',
-            strokeWidth : 1,
-            style : 'bold'
-        });*/
+             x: mouse.getPosition().x, y: mouse.getPosition().y,
+             text : 'FPS: ' + game.getFPS(),
+             size : 30,
+             color : 'black',
+             strokeColor : 'white',
+             strokeWidth : 1,
+             style : 'bold'
+         });*/
 
     };
 
