@@ -21,8 +21,7 @@ function createGameLocation() {
         },
 
         getHeightWithBorder: function () {
-            return this.h - this.borderSize * 2
-                ;
+            return this.h - this.borderSize * 2;
         },
 
         drawAllObjects: function () {
