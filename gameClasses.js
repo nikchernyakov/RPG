@@ -4,8 +4,9 @@ function createHero(pos, gameClassId){
         weapon: undefined,
         skills: undefined,
 
-        inAnimation: false,
-        weaponAnimation: undefined,
+        inExecution: false,
+        drawWeaponAnimation: undefined,
+        defaultWeaponAnimation: undefined,
 
         draw: function () {
             this.character.draw();
@@ -34,13 +35,12 @@ function createHero(pos, gameClassId){
             this.weapon.setAngle(this.character.getAngle() + 90);
 
             //this.weapon.setPositionC(pjs.vector.pointMinus(this.character.getPositionC(), point(0, 45)));
-
         },
         
         checkSkills: function () {
-            if (!this.inAnimation) {
+            if (!this.inExecution) {
                 if (mouse.isPress('LEFT')) {
-                    this.skills[0].executeAnimation(this);
+                    this.skills[0].executeSkill(this);
                 }
             }
         },
@@ -54,16 +54,16 @@ function createHero(pos, gameClassId){
         },
 
         drawWeapon: function () {
-            if(this.inAnimation && this.weaponAnimation !== undefined) {
-                this.weaponAnimation(this);
+            if(this.inExecution && this.drawWeaponAnimation !== undefined) {
+                this.drawWeaponAnimation(this);
             } else {
                 this.weapon.drawFrame(0);
             }
         },
 
         endAnimation: function () {
-            this.inAnimation = false;
-            this.weaponAnimation = undefined;
+            this.inExecution = false;
+            this.drawWeaponAnimation = this.defaultWeaponAnimation;
         }
     };
 
@@ -71,17 +71,32 @@ function createHero(pos, gameClassId){
 }
 
 function setGameClassProperties(hero, gameClassId) {
+    var heroProperties;
     switch (gameClassId){
         case getWarriorId():
-            hero.weapon = getWarriorWeaponFromAnimationPic(hero.character);
-            hero.skills = getWarriorSkills();
+            heroProperties = getWarriorClassProperties(hero);
             break;
     }
+    hero.weapon = heroProperties.weapon;
+    hero.skills = heroProperties.skills;
+    hero.defaultWeaponAnimation = heroProperties.defaultWeaponAnimation;
     return hero;
+}
+
+function getWarriorClassProperties(hero) {
+    return {
+        weapon: getWarriorWeaponFromAnimationPic(hero.character),
+        skills: getWarriorSkills(),
+        defaultWeaponAnimation: getWarriorDefaultAnimation()
+    }
 }
 
 function getWarriorId() {
     return 0;
+}
+
+function getWarriorDefaultAnimation() {
+    return undefined;
 }
 
 function getWarriorWeaponFromPic(character){
@@ -117,9 +132,11 @@ function getWarriorSkills() {
 
 function getWarriorAttackSkill(){
     return {
+        traceObject: new GameObject(),
+
         executeAnimation: function (hero) {
-            hero.inAnimation = true;
-            hero.weaponAnimation = this.animation;
+            hero.inExecution = true;
+            hero.drawWeaponAnimation = this.animation;
 
         },
 
@@ -130,6 +147,13 @@ function getWarriorAttackSkill(){
                 hero.endAnimation();
                 hero.weapon.draw();
             }
+
+        },
+        
+        executeSkill: function (hero) {
+            //this.traceObject.setPositionC();
+
+            this.executeAnimation(hero);
 
         }
 
